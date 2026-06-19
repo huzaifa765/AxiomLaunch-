@@ -9,102 +9,50 @@ in under 5 minutes. No code required.
 
 ---
 
-## Overview
+## Live App
 
-AxiomLaunch is a permissionless token 
-deployment protocol on Base mainnet.
-
-Anyone can deploy a fully functional 
-ERC20 token — with mint, burn, and 
-ownership controls — through a simple 
-interface. No Remix. No Solidity. 
-No technical knowledge required.
+🔗 [axiom-launch.netlify.app](https://axiom-launch.netlify.app)
 
 ---
 
-## How It Works
+## Overview
 
-1. Fill out the token form
-2. Set name, symbol, supply and features
-3. Pay a small deployment fee
-4. Your token is live on Base mainnet
-5. Share your token page instantly
+AxiomLaunch is a permissionless ERC20 
+token deployment protocol on Base mainnet.
+
+Deploy a fully functional token with mint, 
+burn, and ownership controls — through a 
+simple interface. No Remix. No Solidity.
+No technical knowledge required.
 
 ---
 
 ## Features
 
-- **One-click deployment** — ERC20 token live in minutes
-- **Custom supply** — set any total supply
-- **Mint control** — enable or disable minting
-- **Burn control** — enable or disable burning  
-- **Ownership** — full control from day one
-- **Renounce option** — make token fully decentralized
-- **Token directory** — browse all launched tokens
-- **Creator profiles** — view all tokens by address
+- One-click ERC20 deployment on Base
+- Mint & Burn controls
+- Ownership management
+- Token directory — browse all launches
+- Share card — share your launch on X
+- Live ticker — real-time token feed
 
 ---
 
-## Contract Details
+## Contracts
 
-| Contract | Address | Network |
-|----------|---------|---------|
-| TokenFactory | `0x1e31c4474b6d1bac355faf25d3b7b11c9d418ad9` | Base Mainnet |
-| BaseToken (template) | `0x624fbe6affc10a45974f3b1b551fdb8a1ba0a092` | Base Mainnet |
+| Contract | Address |
+|----------|---------|
+| TokenFactory | `0x1e31c4474b6d1bac355faf25d3b7b11c9d418ad9` |
+| BaseToken | `0x624fbe6affc10a45974f3b1b551fdb8a1ba0a092` |
 
-- Compiler: Solidity 0.8.20
-- EVM: London
-- Optimization: Enabled — 200 runs
-- Both contracts verified on BaseScan
-
-🔗 [TokenFactory on BaseScan](https://basescan.org/address/0x1e31c4474b6d1bac355faf25d3b7b11c9d418ad9)
-
----
-
-## Core Functions
-
-```solidity
-// Launch a new token
-launchToken(name, symbol, decimals, supply, mintable, burnable)
-
-// Get token info
-getToken(tokenId)
-
-// Get all tokens by creator
-getCreatorTokens(address)
-
-// Get latest launches
-getLatestTokens()
-```
-
----
-
-## Tech Stack
-
-- Solidity 0.8.20
-- Base Mainnet
-- Ethers.js v6
-- Vanilla JavaScript
-- Deployed on Vercel
-
----
-
-## Roadmap
-
-- [x] ERC20 token factory contract
-- [x] BaseToken template with mint/burn
-- [x] Both contracts verified on BaseScan
-- [ ] Frontend launcher UI
-- [ ] Token directory page
-- [ ] Individual token pages
-- [ ] Uniswap liquidity integration
+🔗 [View on BaseScan](https://basescan.org/address/0x1e31c4474b6d1bac355faf25d3b7b11c9d418ad9)
 
 ---
 
 ## Builder
 
 [@Huzaifa_0101](https://twitter.com/Huzaifa_0101)
-on Base since February 2024
+Active on Base since February 2024
 
 ---
 
