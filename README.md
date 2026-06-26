@@ -1,7 +1,6 @@
-# AxiomLaunch — Token Launcher on Base
+# AxiomLaunch
 
-Deploy your own ERC20 token on Base
-in under 5 minutes. No code required.
+**Deploy your ERC20 token on Base in under 5 minutes. No code required.**
 
 ![Base](https://img.shields.io/badge/Built%20on-Base-0052FF?style=for-the-badge)
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge)
@@ -9,32 +8,29 @@ in under 5 minutes. No code required.
 
 ---
 
-## Live App
+## Live
 
 🔗 [axiom-launch.netlify.app](https://axiom-launch.netlify.app)
 
 ---
 
-## Overview
+## What is AxiomLaunch
 
-AxiomLaunch is a permissionless ERC20 
-token deployment protocol on Base mainnet.
+AxiomLaunch is a permissionless ERC20 token launcher on Base mainnet.
 
-Deploy a fully functional token with mint, 
-burn, and ownership controls — through a 
-simple interface. No Remix. No Solidity.
-No technical knowledge required.
+Anyone can deploy a verified token in under 5 minutes — no Solidity, no Remix, no technical knowledge required. Mint controls, burn controls, and full ownership included. Built entirely onchain with no backend.
 
 ---
 
 ## Features
 
-- One-click ERC20 deployment on Base
-- Mint & Burn controls
-- Ownership management
-- Token directory — browse all launches
-- Share card — share your launch on X
+- One-click ERC20 deployment on Base mainnet
+- Mint and burn controls
+- Full ownership management
+- Token directory — browse all launched tokens
 - Live ticker — real-time token feed
+- Share card — share your launch on X instantly
+- All contracts auto-verified on BaseScan
 
 ---
 
@@ -49,10 +45,19 @@ No technical knowledge required.
 
 ---
 
+## Tech Stack
+
+- Solidity 0.8.20
+- Ethers.js v6
+- Vanilla JavaScript
+- Base Mainnet
+- Netlify
+
+---
+
 ## Builder
 
-[@Huzaifa_0101](https://twitter.com/Huzaifa_0101)
-Active on Base since February 2024
+[@Huzaifa_0101](https://twitter.com/Huzaifa_0101) — Active on Base since February 2024
 
 ---
 
