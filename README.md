@@ -59,6 +59,16 @@ Anyone can deploy a verified token in under 5 minutes — no Solidity, no Remix,
 
 [@Huzaifa_0101](https://twitter.com/Huzaifa_0101) — Active on Base since February 2024
 
+## Roadmap
+
+- [x] ERC20 token factory contract
+- [x] Mint and burn controls
+- [x] BaseScan verification
+- [x] Live frontend on Base mainnet
+- [ ] Uniswap liquidity integration
+- [ ] Token image/banner via IPFS
+- [ ] Mobile responsive improvements
+
 ---
 
 ## License
