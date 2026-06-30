@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="base:app_id" content="6a35277277c938aaf5ebb8e2"/>
+<meta name="talentapp:project_verification" content="452b029f5ec372fbbf8104e0594e1af24e1614c2548e1a70778d86c0948d3da263024f86ef8d8430fd707f5e8f4f943e5fba232f89f2ba4ceabc4a1260916bec"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AxiomLaunch — Token Launcher on Base</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 48 48' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='48' height='48' rx='12' fill='%230f0f0f'/%3E%3Cpath d='M24 7L40 40L36 40L34 28L14 28L12 40L8 40Z' fill='%23fc0083'/%3E%3Cpath d='M24 13L34 28L14 28Z' fill='%230f0f0f'/%3E%3Cline x1='18' y1='27' x2='31' y2='14' stroke='%23fc0083' stroke-width='2.5' stroke-linecap='round'/%3E%3Cline x1='18' y1='14' x2='31' y2='27' stroke='%23fc0083' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+:root{
+  --bg:#131313;
+  --bg2:#1a1a1a;
+  --bg3:#212121;
+  --card:#1a1a1a;
+  --card2:#222222;
+  --border:#2a2a2a;
+  --border2:#333333;
+  --text:#ffffff;
+  --text2:rgba(255,255,255,0.6);
+  --text3:rgba(255,255,255,0.3);
+  --pink:#fc0083;
+  --pink2:#ff6bbd;
+  --pink-dim:rgba(252,0,131,0.1);
+  --pink-glow:rgba(252,0,131,0.25);
+  --green:#40d782;
+  --green-dim:rgba(64,215,130,0.1);
+  --red:#fd766b;
+  --red-dim:rgba(253,118,107,0.1);
+  --f:'Inter',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+}
+body{font-family:var(--f);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ORBS */
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);animation:drift linear infinite;}
+@keyframes drift{0%{transform:translate(0,0) scale(1);}25%{transform:translate(40px,-60px) scale(1.1);}50%{transform:translate(-30px,-100px) scale(0.9);}75%{transform:translate(-60px,-40px) scale(1.05);}100%{transform:translate(0,0) scale(1);}}
+.o1{width:300px;height:300px;background:radial-gradient(circle,rgba(252,0,131,0.35) 0%,transparent 70%);top:10%;left:5%;animation-duration:20s;}
+.o2{width:250px;height:250px;background:radial-gradient(circle,rgba(64,215,130,0.3) 0%,transparent 70%);top:20%;right:8%;animation-duration:25s;animation-delay:-5s;}
+.o3{width:200px;height:200px;background:radial-gradient(circle,rgba(100,100,255,0.25) 0%,transparent 70%);bottom:25%;right:15%;animation-duration:18s;animation-delay:-8s;}
+.o4{width:180px;height:180px;background:radial-gradient(circle,rgba(255,100,50,0.2) 0%,transparent 70%);bottom:20%;left:10%;animation-duration:22s;animation-delay:-3s;}
+.o5{width:150px;height:150px;background:radial-gradient(circle,rgba(100,200,255,0.2) 0%,transparent 70%);top:60%;left:40%;animation-duration:30s;animation-delay:-12s;}
+.o6{width:120px;height:120px;background:radial-gradient(circle,rgba(255,200,50,0.2) 0%,transparent 70%);top:40%;right:35%;animation-duration:16s;animation-delay:-7s;}
+
+.wrap{position:relative;z-index:1;}
+
+/* NAV */
+nav{height:64px;display:flex;align-items:center;padding:0 20px;position:sticky;top:0;z-index:100;background:rgba(19,19,19,0.85);backdrop-filter:blur(12px);}
+.nav-brand{display:flex;align-items:center;gap:9px;cursor:pointer;}
+.nb-ico{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--pink2));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nb-ico svg{width:14px;height:14px;}
+.nb-name{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.nb-name em{color:var(--pink);font-style:normal;}
+
+.nav-mid{flex:1;display:flex;justify-content:center;}
+.nav-search{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:9px 18px;width:280px;cursor:pointer;transition:all 0.2s;}
+.nav-search:hover{border-color:var(--border2);}
+.ns-icon{color:var(--text3);}
+.ns-txt{font-size:13px;color:var(--text3);flex:1;}
+.ns-kbd{font-family:var(--fm);font-size:11px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);padding:2px 7px;border-radius:5px;}
+
+.nav-links{display:flex;gap:2px;margin-right:16px;}
+.nl{padding:8px 16px;font-size:14px;font-weight:500;color:var(--text2);background:transparent;border:none;border-radius:12px;cursor:pointer;font-family:var(--f);transition:all 0.15s;}
+.nl:hover{color:var(--text);background:rgba(255,255,255,0.06);}
+.nl.on{color:var(--text);}
+
+.nav-right{display:flex;align-items:center;gap:8px;}
+#cb{font-size:13px;font-weight:600;background:var(--pink-dim);color:var(--pink);border:1px solid rgba(252,0,131,0.25);padding:9px 18px;border-radius:12px;cursor:pointer;font-family:var(--f);transition:all 0.2s;}
+#cb:hover{background:var(--pink);color:#fff;}
+.wrow{display:none;align-items:center;gap:8px;}
+.wchip{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 14px;}
+.wdot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+.wa{font-family:var(--fm);font-size:12px;font-weight:500;color:var(--text);}
+#db{font-family:var(--f);font-size:13px;font-weight:500;background:transparent;border:1px solid var(--border2);color:var(--text2);padding:9px 14px;border-radius:12px;cursor:pointer;transition:all 0.15s;}
+#db:hover{border-color:var(--red);color:var(--red);}
+
+/* PAGE */
+.pg{animation:up 0.35s cubic-bezier(.16,1,.3,1) both;}
+@keyframes up{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* ===== HOME ===== */
+.home-wrap{min-height:calc(100vh - 64px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
+.home-title{font-size:clamp(44px,7vw,80px);font-weight:900;letter-spacing:-3px;text-align:center;line-height:1.0;margin-bottom:16px;}
+.home-title em{font-style:normal;color:var(--pink);}
+.home-sub{font-size:16px;color:var(--text2);text-align:center;max-width:440px;line-height:1.7;margin-bottom:36px;font-weight:400;}
+
+/* CENTER CARD */
+.center-card{background:var(--card);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:440px;overflow:hidden;margin-bottom:20px;}
+.cc-tabs{display:flex;padding:8px;gap:4px;border-bottom:1px solid var(--border);}
+.cct{flex:1;padding:10px;font-size:14px;font-weight:600;border:none;border-radius:12px;cursor:pointer;font-family:var(--f);background:transparent;color:var(--text2);transition:all 0.2s;}
+.cct.on{background:var(--bg3);color:var(--text);}
+.cc-body{padding:16px;}
+
+/* TOKEN CARDS IN HOME */
+.token-orbs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:600px;}
+.tok-orb{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:10px 14px;cursor:pointer;transition:all 0.2s;}
+.tok-orb:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-2px);}
+.to-ico{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.to-name{font-size:13px;font-weight:600;}
+.to-sup{font-size:11px;color:var(--text3);}
+
+/* ===== LAUNCH PAGE ===== */
+.launch-wrap{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.launch-card{background:var(--card);border:1px solid var(--border2);border-radius:24px;width:100%;max-width:480px;overflow:hidden;}
+.lc-head{padding:20px 20px 0;}
+.lch-title{font-size:20px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px;}
+.lch-sub{font-size:13px;color:var(--text2);margin-bottom:18px;}
+.lc-body{padding:0 16px 16px;}
+
+/* FIELDS */
+.field-group{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px;transition:border-color 0.15s;}
+.field-group:focus-within{border-color:var(--border2);}
+.fg-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+.fi{width:100%;background:transparent;border:none;font-family:var(--f);font-size:22px;font-weight:600;color:var(--text);outline:none;}
+.fi::placeholder{color:var(--text3);font-weight:400;font-size:22px;}
+.fi-small{font-size:15px;font-weight:500;}
+.fi-small::placeholder{font-size:15px;}
+.two-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.mini-group{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;transition:border-color 0.15s;}
+.mini-group:focus-within{border-color:var(--border2);}
+
+/* TOGGLES */
+.feat-row{display:flex;gap:8px;margin-bottom:14px;}
+.feat-tog{flex:1;display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px 14px;cursor:pointer;transition:all 0.2s;}
+.feat-tog:hover{border-color:var(--border2);}
+.feat-tog.on{border-color:var(--pink);background:var(--pink-dim);}
+.ft-left{font-size:13px;font-weight:600;}
+.ft-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.ft-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+.feat-tog.on .ft-check{background:var(--pink);border-color:var(--pink);}
+
+/* FEE */
+.fee-line{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;}
+.fl-left{font-size:13px;color:var(--text2);}
+.fl-right{display:flex;align-items:center;gap:6px;}
+.fl-fee{font-family:var(--fm);font-size:14px;font-weight:600;color:var(--text);}
+.fl-badge{font-size:10px;font-weight:600;background:var(--green-dim);color:var(--green);border:1px solid rgba(64,215,130,0.2);padding:2px 8px;border-radius:6px;}
+
+.launch-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;border:none;border-radius:14px;font-family:var(--f);font-weight:700;font-size:16px;cursor:pointer;transition:all 0.2s;}
+.launch-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px var(--pink-glow);}
+.launch-btn:disabled{opacity:0.35;transform:none;cursor:not-allowed;box-shadow:none;}
+
+/* ===== EXPLORE PAGE ===== */
+.expl-wrap{padding:40px 24px;max-width:1200px;margin:0 auto;}
+.expl-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;}
+.expl-title{font-size:32px;font-weight:800;letter-spacing:-1px;}
+.expl-sub{font-size:13px;color:var(--text3);margin-top:4px;}
+.expl-btn{padding:12px 22px;background:var(--pink);color:#fff;border:none;border-radius:12px;font-family:var(--f);font-weight:600;font-size:14px;cursor:pointer;transition:all 0.2s;}
+.expl-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--pink-glow);}
+
+.search-bar{display:flex;gap:10px;margin-bottom:20px;}
+.sb-inp{flex:1;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:13px 16px;font-family:var(--f);font-size:14px;color:var(--text);outline:none;transition:all 0.2s;}
+.sb-inp::placeholder{color:var(--text3);}
+.sb-inp:focus{border-color:rgba(252,0,131,0.3);}
+.pills{display:flex;gap:6px;}
+.pill{padding:8px 16px;font-size:12px;font-weight:600;font-family:var(--fm);border:1px solid var(--border2);border-radius:20px;background:transparent;color:var(--text3);cursor:pointer;transition:all 0.15s;letter-spacing:0.3px;}
+.pill.on{background:var(--pink);color:#fff;border-color:var(--pink);}
+.pill:hover:not(.on){color:var(--text2);border-color:rgba(255,255,255,0.15);}
+
+.tok-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+
+
+/* ===== MY TOKENS ===== */
+.my-wrap{padding:40px 24px;max-width:900px;margin:0 auto;}
+.prof-card{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:24px;margin-bottom:24px;display:flex;align-items:center;gap:18px;}
+.pca{width:52px;height:52px;background:linear-gradient(135deg,var(--pink),var(--pink2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
+.pca-addr{font-family:var(--fm);font-size:12px;color:var(--text2);word-break:break-all;margin-bottom:4px;}
+.pca-stats{display:flex;gap:22px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.ps{text-align:center;}
+.ps-v{font-size:20px;font-weight:700;color:var(--pink);}
+.ps-l{font-family:var(--fm);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-top:2px;}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;}
+.empty h3{font-size:18px;font-weight:600;color:var(--text2);margin-bottom:8px;letter-spacing:-0.3px;}
+.empty p{font-size:14px;color:var(--text3);line-height:1.6;}
+
+/* SHARE MODAL */
+#shareWrap{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;display:none;align-items:center;justify-content:center;}
+.share-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px;padding:26px;max-width:440px;width:90%;animation:up 0.3s ease;}
+.shb-title{font-size:20px;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;}
+.shb-sub{font-size:13px;color:var(--text2);margin-bottom:20px;}
+.share-card{background:linear-gradient(135deg,#1a0a12,#0d0d0d);border:1px solid rgba(252,0,131,0.2);border-radius:18px;padding:22px;margin-bottom:18px;position:relative;overflow:hidden;}
+.sc-blob{position:absolute;width:200px;height:200px;background:radial-gradient(circle,rgba(252,0,131,0.12) 0%,transparent 65%);top:-60px;right:-40px;}
+.sc-in{position:relative;z-index:1;}
+.sc-brand{display:flex;align-items:center;gap:7px;margin-bottom:16px;}
+.sc-bico{width:20px;height:20px;background:linear-gradient(135deg,var(--pink),var(--pink2));border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.sc-bico svg{width:9px;height:9px;}
+.sc-bname{font-size:11px;font-weight:700;color:var(--pink);}
+.sc-tname{font-size:26px;font-weight:800;color:#fff;letter-spacing:-0.8px;margin-bottom:3px;}
+.sc-tsym{font-family:var(--fm);font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:14px;}
+.sc-stats{display:flex;gap:18px;}
+.scs-v{font-size:15px;font-weight:700;color:var(--pink);}
+.scs-l{font-family:var(--fm);font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.8px;}
+.sc-live{position:absolute;bottom:18px;right:18px;background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;font-family:var(--fm);font-size:9px;font-weight:700;padding:4px 10px;border-radius:6px;letter-spacing:0.8px;}
+.sh-btns{display:flex;gap:8px;}
+.shb-p{flex:1;padding:13px;background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;border:none;border-radius:12px;font-family:var(--f);font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;}
+.shb-p:hover{box-shadow:0 6px 18px var(--pink-glow);}
+.shb-s{padding:13px 16px;background:var(--bg3);color:var(--text2);border:1px solid var(--border2);border-radius:12px;font-family:var(--f);font-weight:500;font-size:14px;cursor:pointer;}
+.shb-c{width:100%;padding:11px;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:12px;font-family:var(--f);font-size:13px;cursor:pointer;margin-top:8px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:22px;right:22px;z-index:999;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:12px 18px;font-family:var(--fm);font-size:12px;color:var(--text);max-width:280px;box-shadow:0 8px 30px rgba(0,0,0,0.5);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(.16,1,.3,1);}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.ok{border-color:rgba(64,215,130,0.3);color:var(--green);}
+#toast.err{border-color:rgba(253,118,107,0.3);color:var(--red);}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--pink);border-radius:50%;animation:spin 0.65s linear infinite;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ORB COLORS */
+.oc1{background:radial-gradient(circle,rgba(252,0,131,1) 0%,rgba(200,0,100,0.8) 50%,transparent 70%);}
+.oc2{background:radial-gradient(circle,rgba(64,215,130,1) 0%,rgba(30,180,90,0.8) 50%,transparent 70%);}
+.oc3{background:radial-gradient(circle,rgba(100,130,255,1) 0%,rgba(60,80,220,0.8) 50%,transparent 70%);}
+.oc4{background:radial-gradient(circle,rgba(255,120,60,1) 0%,rgba(220,80,30,0.8) 50%,transparent 70%);}
+.oc5{background:radial-gradient(circle,rgba(100,200,255,1) 0%,rgba(50,150,220,0.8) 50%,transparent 70%);}
+.oc6{background:radial-gradient(circle,rgba(255,220,50,1) 0%,rgba(220,170,20,0.8) 50%,transparent 70%);}
+
+
+/* TICKER STRIP */
+.ticker-wrap{width:100%;overflow:hidden;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02);padding:10px 0;}
+.ticker-track{display:flex;gap:0;animation:tickerMove 20s linear infinite;width:max-content;}
+.ticker-track:hover{animation-play-state:paused;}
+@keyframes tickerMove{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.tick-item{display:flex;align-items:center;gap:8px;padding:0 28px;border-right:1px solid var(--border);flex-shrink:0;white-space:nowrap;}
+.ti-ico{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:8px;font-weight:700;color:#fff;flex-shrink:0;}
+.ti-sym{font-family:var(--fm);font-size:12px;font-weight:600;color:var(--text);}
+.ti-sup{font-family:var(--fm);font-size:11px;color:var(--text3);}
+
+
+/* IMPROVED TOKEN CARDS */
+.tok-card{background:var(--card);border:1px solid var(--border2);border-radius:20px;overflow:hidden;cursor:pointer;transition:all 0.25s;position:relative;}
+.tok-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--pink),transparent);opacity:0;transition:opacity 0.3s;}
+.tok-card:hover::before{opacity:1;}
+.tok-card:hover{transform:translateY(-3px);border-color:rgba(252,0,131,0.2);}
+
+/* Card Banner */
+.tc-banner{height:80px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.tc-banner-img{width:100%;height:100%;object-fit:cover;}
+.tc-banner-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;font-family:var(--fm);color:rgba(255,255,255,0.15);letter-spacing:-1px;}
+
+/* Token Logo */
+.tc-logo-wrap{position:relative;padding:0 16px;margin-top:-22px;margin-bottom:10px;display:flex;align-items:flex-end;justify-content:space-between;}
+.tc-logo{width:44px;height:44px;border-radius:50%;border:3px solid var(--card);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:14px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0;}
+.tc-logo img{width:100%;height:100%;object-fit:cover;}
+.tc-new-badge{font-family:var(--fm);font-size:9px;font-weight:700;background:var(--pink);color:#fff;padding:3px 8px;border-radius:6px;letter-spacing:0.5px;margin-bottom:4px;}
+
+.tc-info{padding:0 16px 14px;}
+.tc-name{font-size:15px;font-weight:700;letter-spacing:-0.3px;margin-bottom:2px;}
+.tc-sym{font-family:var(--fm);font-size:11px;color:var(--text3);margin-bottom:12px;}
+
+.tc-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.tcs{background:var(--bg3);border-radius:10px;padding:9px;text-align:center;}
+.tcs-v{font-size:13px;font-weight:700;margin-bottom:2px;}
+.tcs-l{font-family:var(--fm);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;}
+
+.tc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.tctag{font-family:var(--fm);font-size:11px;font-weight:700;padding:6px 14px;border-radius:8px;letter-spacing:0.3px;transition:all 0.2s;}
+.tt-m{background:rgba(64,215,130,0.12);color:var(--green);border:1px solid rgba(64,215,130,0.35);}
+.tt-m:hover{background:rgba(64,215,130,0.22);border-color:rgba(64,215,130,0.6);transform:translateY(-1px);}
+.tt-b{background:rgba(253,118,107,0.12);color:var(--red);border:1px solid rgba(253,118,107,0.35);}
+.tt-b:hover{background:rgba(253,118,107,0.22);border-color:rgba(253,118,107,0.6);transform:translateY(-1px);}
+
+.tc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);}
+.tcf-addr{font-family:var(--fm);font-size:10px;color:var(--text3);}
+.tcf-link{font-family:var(--fm);font-size:11px;color:var(--pink);text-decoration:none;font-weight:600;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:44px 24px 22px;}
+.fg{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;max-width:1200px;margin:0 auto 36px;}
+.fg-name{font-size:18px;font-weight:700;letter-spacing:-0.3px;margin-bottom:8px;}
+.fg-name em{color:var(--pink);font-style:normal;}
+.fg-desc{font-size:13px;color:var(--text2);line-height:1.7;max-width:230px;margin-bottom:18px;}
+.fg-soc{display:flex;gap:7px;}
+.fgs{width:32px;height:32px;border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;text-decoration:none;color:var(--text3);transition:all 0.15s;}
+.fgs:hover{border-color:rgba(252,0,131,0.3);color:var(--pink);}
+.fc-t{font-family:var(--fm);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:12px;}
+.fc-l{display:block;font-size:13px;color:var(--text2);text-decoration:none;margin-bottom:9px;cursor:pointer;background:none;border:none;font-family:var(--f);text-align:left;transition:color 0.15s;}
+.fc-l:hover{color:var(--pink);}
+.f-bot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;max-width:1200px;margin:0 auto;padding-top:18px;border-top:1px solid var(--border);}
+.f-copy{font-family:var(--fm);font-size:11px;color:var(--text3);}
+.f-copy a{color:var(--text2);text-decoration:none;}
+
+@media(max-width:768px){
+  .nav-mid{display:none;}
+  .nav-links{display:none;}
+  .fg{grid-template-columns:1fr 1fr;}
+  .home-title{font-size:36px;letter-spacing:-1.5px;}
+  .tok-grid{grid-template-columns:1fr;}
+  .expl-wrap,.my-wrap{padding:20px 16px;}
+}
+</style>
+</head>
+<body>
+<div class="orbs">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+  <div class="orb o4"></div>
+  <div class="orb o5"></div>
+  <div class="orb o6"></div>
+</div>
+<div class="wrap">
+
+<nav>
+  <div class="nav-brand" onclick="goTo('home')">
+    <div class="nb-ico">
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <rect width="48" height="48" rx="12" fill="#0f0f0f"/>
+        <path d="M24 7L40 40L36 40L34 28L14 28L12 40L8 40Z" fill="#fc0083"/>
+        <path d="M24 13L34 28L14 28Z" fill="#0f0f0f"/>
+        <line x1="18" y1="27" x2="31" y2="14" stroke="#fc0083" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="18" y1="14" x2="31" y2="27" stroke="#fc0083" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="nb-name">Axiom<em>Launch</em></div>
+  </div>
+  <div class="nav-mid">
+    <div class="nav-search" onclick="goTo('explore');setNavByIdx(1);setTimeout(()=>document.getElementById('sInp')?.focus(),100)">
+      <svg class="ns-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span class="ns-txt">Search tokens...</span>
+      <span class="ns-kbd">/</span>
+    </div>
+  </div>
+  <div class="nav-links">
+    <button class="nl on" onclick="goTo('home');setNav(this)">Home</button>
+    <button class="nl" onclick="goTo('explore');setNav(this)">Explore</button>
+    <button class="nl" onclick="goTo('launch');setNav(this)">Launch</button>
+    <button class="nl" onclick="goTo('mytokens');setNav(this)">My Tokens</button>
+  </div>
+  <div class="nav-right">
+    <button id="cb" onclick="connectWallet()">Connect</button>
+    <div class="wrow" id="wrow">
+      <div class="wchip"><div class="wdot"></div><span class="wa" id="waddr">—</span></div>
+      <button id="db" onclick="disconnectWallet()">Disconnect</button>
+    </div>
+  </div>
+</nav>
+<!-- TICKER -->
+<div class="ticker-wrap" id="tickerWrap" style="display:none">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- HOME -->
+<div id="pgHome" class="pg">
+  <div class="home-wrap">
+    <h1 class="home-title">Launch anytime,<br/><em>anywhere.</em></h1>
+    <p class="home-sub">Deploy your ERC20 token on Base in minutes. No code. No complexity. Just launch.</p>
+
+    <div class="center-card">
+      <div class="cc-tabs">
+        <button class="cct on" onclick="goTo('launch');setNavByIdx(2)">Launch Token</button>
+        <button class="cct" onclick="goTo('explore');setNavByIdx(1)">Explore Tokens</button>
+      </div>
+      <div class="cc-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:13px;color:var(--text3);">Total Launched</span>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:600;color:var(--text)" id="homeCount">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:13px;color:var(--text3);">Network</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text)">Base Mainnet</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <span style="font-size:13px;color:var(--text3);">Launch Fee</span>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:600;color:var(--green)" id="homeFee">—</span>
+        </div>
+        <button class="launch-btn" onclick="goTo('launch');setNavByIdx(2)">Get started</button>
+        <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:12px;line-height:1.6;">Deploy ERC20 tokens with <span style="color:var(--pink)">zero coding</span> on Base blockchain</p>
+      </div>
+    </div>
+
+    <div class="token-orbs" id="homeOrbs"></div>
+  </div>
+
+  <footer>
+    <div class="fg">
+      <div>
+        <div class="fg-name">Axiom<em>Launch</em></div>
+        <div class="fg-desc">The simplest way to launch an ERC20 token on Base mainnet. No code. No complexity.</div>
+        <div class="fg-soc">
+          <a class="fgs" href="https://twitter.com/Huzaifa_0101" target="_blank">𝕏</a>
+          <a class="fgs" href="https://farcaster.xyz/huzaifa001" target="_blank">⬡</a>
+          <a class="fgs" href="https://github.com/huzaifa765/AxiomLaunch" target="_blank">⌥</a>
+        </div>
+      </div>
+      <div>
+        <div class="fc-t">Protocol</div>
+        <button class="fc-l" onclick="goTo('launch')">Launch Token</button>
+        <button class="fc-l" onclick="goTo('explore')">Explore</button>
+        <button class="fc-l" onclick="goTo('mytokens')">Portfolio</button>
+      </div>
+      <div>
+        <div class="fc-t">Community</div>
+        <a class="fc-l" href="https://twitter.com/Huzaifa_0101" target="_blank">Twitter / X</a>
+        <a class="fc-l" href="https://farcaster.xyz" target="_blank">Farcaster</a>
+        <a class="fc-l" href="https://warpcast.com/~/channel/base-builds" target="_blank">Base Builds</a>
+      </div>
+      <div>
+        <div class="fc-t">Resources</div>
+        <a class="fc-l" href="https://basescan.org/address/0x1e31c4474b6d1bac355faf25d3b7b11c9d418ad9" target="_blank">BaseScan</a>
+        <a class="fc-l" href="https://github.com/huzaifa765/AxiomLaunch" target="_blank">GitHub</a>
+        <a class="fc-l" href="https://base.org" target="_blank">Base Network</a>
+      </div>
+    </div>
+    <div class="f-bot">
+      <div class="f-copy">Built on <a href="https://base.org">@base</a> by <a href="https://twitter.com/Huzaifa_0101">@Huzaifa_0101</a> · MIT License</div>
+    </div>
+  </footer>
+</div>
+
+<!-- LAUNCH -->
+<div id="pgLaunch" class="pg" style="display:none">
+  <div class="launch-wrap">
+    <div class="launch-card">
+      <div class="lc-head">
+        <div class="lch-title">Launch your token</div>
+        <div class="lch-sub">Deploy a verified ERC20 on Base mainnet</div>
+      </div>
+      <div class="lc-body">
+        <div class="field-group">
+          <div class="fg-label">Token Name</div>
+          <input class="fi fi-small" id="tName" placeholder="e.g. My Base Token" oninput="updatePrev()"/>
+        </div>
+        <div class="two-inputs">
+          <div class="mini-group">
+            <div class="fg-label">Symbol</div>
+            <input class="fi fi-small" id="tSym" placeholder="MBT" maxlength="8" oninput="updatePrev()"/>
+          </div>
+          <div class="mini-group">
+            <div class="fg-label">Total Supply</div>
+            <input class="fi fi-small" id="tSup" type="number" placeholder="1,000,000" oninput="updatePrev()"/>
+          </div>
+        </div>
+        <div class="mini-group" style="margin-bottom:10px;">
+          <div class="fg-label">Decimals</div>
+          <input class="fi fi-small" id="tDec" type="number" placeholder="18" value="18"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div class="mini-group" style="cursor:pointer;" onclick="document.getElementById('logoUpload').click()">
+            <div class="fg-label">Token Logo</div>
+            <div id="logoPreview" style="width:44px;height:44px;border-radius:50%;background:var(--border2);display:flex;align-items:center;justify-content:center;margin-top:4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            </div>
+            <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="previewLogo(this)"/>
+          </div>
+          <div class="mini-group" style="cursor:pointer;" onclick="document.getElementById('bannerUpload').click()">
+            <div class="fg-label">Banner Image</div>
+            <div id="bannerPreview" style="width:100%;height:44px;border-radius:8px;background:var(--border2);display:flex;align-items:center;justify-content:center;margin-top:4px;overflow:hidden;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <input type="file" id="bannerUpload" accept="image/*" style="display:none" onchange="previewBanner(this)"/>
+          </div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-tog" id="togM" onclick="tog('togM','mint')">
+            <div><div class="ft-left">Mintable</div><div class="ft-sub">Create more tokens</div></div>
+            <div class="ft-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="2,6 5,9 10,3"/></svg></div>
+          </div>
+          <div class="feat-tog" id="togB" onclick="tog('togB','burn')">
+            <div><div class="ft-left">Burnable</div><div class="ft-sub">Destroy tokens</div></div>
+            <div class="ft-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="2,6 5,9 10,3"/></svg></div>
+          </div>
+        </div>
+        <div class="fee-line">
+          <span class="fl-left">Deployment fee</span>
+          <div class="fl-right"><span class="fl-fee" id="feeDisp">—</span><span class="fl-badge">Low fee</span></div>
+        </div>
+        <button class="launch-btn" id="lBtn" onclick="launchToken()">Launch token</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPLORE -->
+<div id="pgExplore" class="pg" style="display:none">
+  <div class="expl-wrap">
+    <div class="expl-head">
+      <div><div class="expl-title">Explore tokens</div><div class="expl-sub">All tokens launched on AxiomLaunch</div></div>
+      <button class="expl-btn" onclick="goTo('launch');setNavByIdx(2)">Launch token</button>
+    </div>
+    <div class="search-bar">
+      <input class="sb-inp" id="sInp" placeholder="Search tokens..." oninput="renderToks()"/>
+      <div class="pills">
+        <button class="pill on" onclick="setFil('all',this)">All</button>
+        <button class="pill" onclick="setFil('mint',this)">Mintable</button>
+        <button class="pill" onclick="setFil('burn',this)">Burnable</button>
+      </div>
+    </div>
+    <div class="tok-grid" id="explGrid">
+      <div class="empty"><h3>No tokens yet</h3><p>Connect wallet to browse</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- MY TOKENS -->
+<div id="pgMytokens" class="pg" style="display:none">
+  <div class="my-wrap">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;">
+      <div><div style="font-size:28px;font-weight:800;letter-spacing:-1px;">My tokens</div><div style="font-size:13px;color:var(--text3);margin-top:4px;">Tokens you have deployed</div></div>
+      <button class="expl-btn" onclick="goTo('launch');setNavByIdx(2)">Launch new</button>
+    </div>
+    <div class="prof-card">
+      <div class="pca" id="pcAva">0x</div>
+      <div style="flex:1">
+        <div class="pca-addr" id="pcAddr">Connect wallet to view</div>
+        <div class="pca-stats">
+          <div class="ps"><div class="ps-v" id="myCount">—</div><span class="ps-l">Tokens</span></div>
+          <div class="ps"><div class="ps-v" style="color:var(--text2);font-size:14px">Base</div><span class="ps-l">Network</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tok-grid" id="myGrid">
+      <div class="empty"><h3>No tokens yet</h3><p>Launch your first token!</p></div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- MINT BURN MODAL -->
+<div id="mbWrap" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center;">
+  <div class="share-box">
+    <div class="shb-title" id="mbTitle">Mint Tokens</div>
+    <div class="shb-sub" id="mbSub">Add more tokens to supply</div>
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Amount</div>
+      <input id="mbAmount" type="number" placeholder="Enter amount e.g. 1000" style="width:100%;background:transparent;border:none;font-family:var(--f);font-size:22px;font-weight:600;color:var(--text);outline:none;" oninput="this.placeholder=''"/>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--text3);">Token</span><span id="mbName" style="color:var(--text);font-weight:600;"></span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3);">Action</span><span id="mbActionLabel" style="color:var(--pink);font-weight:600;"></span></div>
+    </div>
+    <div class="sh-btns">
+      <button class="shb-p" id="mbExecBtn" onclick="executeMintBurn()">Confirm</button>
+      <button class="shb-s" onclick="document.getElementById('mbWrap').style.display='none'">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE -->
+<div id="shareWrap" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;align-items:center;justify-content:center;">
+  <div class="share-box">
+    <div class="shb-title">Token launched! 🎉</div>
+    <div class="shb-sub">Share your launch with the community</div>
+    <div class="share-card">
+      <div class="sc-blob"></div>
+      <div class="sc-in">
+        <div class="sc-brand">
+          <div class="sc-bico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L18 10H14V22H10V10H6L12 2Z" fill="#fff"/></svg></div>
+          <span class="sc-bname">AxiomLaunch</span>
+        </div>
+        <div class="sc-tname" id="scName">—</div>
+        <div class="sc-tsym" id="scSym">—</div>
+        <div class="sc-stats">
+          <div><div class="scs-v" id="scSup">—</div><div class="scs-l">Supply</div></div>
+          <div><div class="scs-v">Base</div><div class="scs-l">Network</div></div>
+        </div>
+        <div class="sc-live">LIVE</div>
+      </div>
+    </div>
+    <div class="sh-btns">
+      <button class="shb-p" onclick="shareX()">Share on X</button>
+      <button class="shb-s" onclick="copyAddr()">Copy Address</button>
+    </div>
+    <button class="shb-c" onclick="document.getElementById('shareWrap').style.display='none'">Close</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const FACTORY="0x1e31c4474b6d1bac355faf25d3b7b11c9d418ad9",CHAIN=8453;
+const BUILDER_CODE='bc_hxh4hpay';
+const DATA_SUFFIX='0x'+Array.from(new TextEncoder().encode(BUILDER_CODE)).map(b=>b.toString(16).padStart(2,'0')).join('');
+const ABI=["function launchToken(string,string,uint8,uint256,bool,bool) external payable returns(address)","function getToken(uint256) external view returns(tuple(address tokenAddress,string name,string symbol,uint256 totalSupply,address creator,uint256 createdAt,bool mintable,bool burnable))","function getCreatorTokens(address) external view returns(uint256[])","function getLatestTokens() external view returns(tuple(address tokenAddress,string name,string symbol,uint256 totalSupply,address creator,uint256 createdAt,bool mintable,bool burnable)[])","function tokenCount() external view returns(uint256)","function launchFee() external view returns(uint256)"];
+let provider,signer,contract,userAddr,mintF=false,burnF=false,lastLaunch=null,curFil='all',allToks=[];
+
+
+const TOKEN_ABI=["function mint(address,uint256) external","function burn(uint256) external","function decimals() external view returns(uint8)","function symbol() external view returns(string)","function balanceOf(address) external view returns(uint256)","function owner() external view returns(address)"];
+
+let logoB64='', bannerB64='', lastLaunchAddr='';
+
+function previewLogo(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    logoB64=e.target.result;
+    const prev=document.getElementById('logoPreview');
+    prev.innerHTML=`<img src="${logoB64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewBanner(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    bannerB64=e.target.result;
+    const prev=document.getElementById('bannerPreview');
+    prev.innerHTML=`<img src="${bannerB64}" style="width:100%;height:100%;object-fit:cover;"/>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveTokenImages(addr){
+  if(logoB64)localStorage.setItem('tok_logo_'+addr,logoB64);
+  if(bannerB64)localStorage.setItem('tok_img_'+addr,bannerB64);
+  logoB64='';bannerB64='';
+}
+let mbAddr='',mbAction='';
+function openMintBurn(addr,action,name){
+  if(!userAddr){toast('Connect wallet first','err');return;}
+  mbAddr=addr;mbAction=action;
+  document.getElementById('mbTitle').textContent=action==='mint'?'Mint Tokens':'Burn Tokens';
+  document.getElementById('mbSub').textContent=action==='mint'?'Create new tokens and add to your wallet':'Permanently destroy tokens from your wallet';
+  document.getElementById('mbName').textContent=name;
+  document.getElementById('mbActionLabel').textContent=action.toUpperCase();
+  document.getElementById('mbAmount').value='';
+  document.getElementById('mbWrap').style.display='flex';
+}
+
+async function executeMintBurn(){
+  const amount=document.getElementById('mbAmount').value;
+  if(!amount||parseFloat(amount)<=0){toast('Enter valid amount','err');return;}
+  const btn=document.getElementById('mbExecBtn');
+  btn.innerHTML='<span class="spin"></span> Processing...';btn.disabled=true;
+  try{
+    const tok=new ethers.Contract(mbAddr,TOKEN_ABI,signer);
+    const dec=await tok.decimals();
+    const realAmt=BigInt(Math.floor(parseFloat(amount)))*(10n**BigInt(dec));
+    let tx;
+    if(mbAction==='mint'){
+      tx=await tok.mint(userAddr,realAmt);
+      toast('Minting...','');
+    }else{
+      tx=await tok.burn(realAmt);
+      toast('Burning...','');
+    }
+    await tx.wait();
+    document.getElementById('mbWrap').style.display='none';
+    toast(mbAction==='mint'?'Tokens minted successfully!':'Tokens burned successfully!','ok');
+    if(document.getElementById('pgMytokens').style.display!=='none')loadMyToks();
+  }catch(e){toast('Error: '+(e.reason||'Make sure you are owner and feature is enabled'),'err');}
+  btn.innerHTML='Confirm';btn.disabled=false;
+}
+
+async function executeManage(){
+  if(!contract){toast('Connect wallet first','err');return;}
+  const addr=document.getElementById('mTokenAddr').value.trim();
+  const action=document.getElementById('mAction').value;
+  const amount=document.getElementById('mAmount').value;
+  if(!addr||!amount){toast('Fill all fields','err');return;}
+  const btn=document.getElementById('manageBtn');
+  btn.innerHTML='<span class="spin"></span> Processing...';btn.disabled=true;
+  try{
+    const tok=new ethers.Contract(addr,TOKEN_ABI,signer);
+    const dec=await tok.decimals();
+    const realAmt=BigInt(Math.floor(parseFloat(amount)))*(10n**BigInt(dec));
+    let tx;
+    if(action==='mint'){
+      tx=await tok.mint(userAddr,realAmt);
+      toast('Minting tokens...','');
+    }else{
+      tx=await tok.burn(realAmt);
+      toast('Burning tokens...','');
+    }
+    await tx.wait();
+    toast(action==='mint'?'Tokens minted!':'Tokens burned!','ok');
+  }catch(e){toast('Error: '+(e.reason||'Check if you are owner and feature is enabled'),'err');}
+  btn.innerHTML='Execute';btn.disabled=false;
+}
+
+function toast(m,t=''){const el=document.getElementById('toast');el.textContent=m;el.className='show '+t;clearTimeout(el._t);el._t=setTimeout(()=>el.className='',4000);}
+function short(a){return a?a.slice(0,6)+'...'+a.slice(-4):'—';}
+function fmtN(n){const v=Number(n);if(v>=1e9)return(v/1e9).toFixed(1)+'B';if(v>=1e6)return(v/1e6).toFixed(1)+'M';if(v>=1e3)return(v/1e3).toFixed(1)+'K';return v.toLocaleString();}
+function ago(ts){const d=Math.floor(Date.now()/1000)-Number(ts);if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
+
+const ORB_COLORS=['#fc0083','#40d782','#6482ff','#ff783c','#64c8ff','#ffdc32','#b44cff','#ff6b6b'];
+function randColor(){return ORB_COLORS[Math.floor(Math.random()*ORB_COLORS.length)];}
+
+function goTo(pg){
+  document.querySelectorAll('.pg').forEach(p=>p.style.display='none');
+  const el=document.getElementById('pg'+pg.charAt(0).toUpperCase()+pg.slice(1));
+  if(el){el.style.display='block';void el.offsetWidth;el.className='pg';}
+  window.scrollTo(0,0);
+  if(pg==='explore'&&contract)loadExplore();
+  if(pg==='mytokens'&&userAddr&&contract)loadMyToks();
+  if(pg==='launch'&&contract)loadFee();
+}
+function setNav(el){document.querySelectorAll('.nl').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+function setNavByIdx(i){const b=document.querySelectorAll('.nl');b.forEach(x=>x.classList.remove('on'));if(b[i])b[i].classList.add('on');}
+function tog(id,key){
+  const el=document.getElementById(id);el.classList.toggle('on');
+  if(key==='mint')mintF=el.classList.contains('on');
+  if(key==='burn')burnF=el.classList.contains('on');
+}
+function updatePrev(){}
+
+async function connectWallet(){
+  if(!window.ethereum){toast('MetaMask not found','err');return;}
+  try{
+    provider=new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts",[]);
+    const net=await provider.getNetwork();
+    if(Number(net.chainId)!==CHAIN){try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x2105'}]});provider=new ethers.BrowserProvider(window.ethereum);}catch{toast('Switch to Base Mainnet','err');return;}}
+    signer=await provider.getSigner();userAddr=await signer.getAddress();
+    contract=new ethers.Contract(FACTORY,ABI,signer);
+    document.getElementById('cb').style.display='none';
+    document.getElementById('wrow').style.display='flex';
+    document.getElementById('waddr').textContent=short(userAddr);
+    document.getElementById('pcAva').textContent=userAddr.slice(2,4).toUpperCase();
+    document.getElementById('pcAddr').textContent=userAddr;
+    toast('Connected','ok');loadHome();
+    window.ethereum.on('accountsChanged',()=>disconnectWallet());
+  }catch{toast('Connection failed','err');}
+}
+
+function disconnectWallet(){
+  provider=signer=contract=userAddr=null;
+  document.getElementById('cb').style.display='block';
+  document.getElementById('wrow').style.display='none';
+  toast('Disconnected','');
+}
+
+
+async function loadTicker(){
+  if(!contract)return;
+  try{
+    const toks=await contract.getLatestTokens();
+    if(!toks.length)return;
+    const track=document.getElementById('tickerTrack');
+    document.getElementById('tickerWrap').style.display='block';
+    const items=toks.map(t=>`
+      <div class="tick-item">
+        <div class="ti-ico" style="background:${randColor()}">${(t[1]||t.symbol||'?').slice(0,2).toUpperCase()}</div>
+        <span class="ti-sym">$${t[1]||t.symbol}</span>
+        <span class="ti-sup">${fmtN(t[3]||t.totalSupply)}</span>
+      </div>`).join('');
+    track.innerHTML=items+items;
+  }catch{}
+}
+
+async function loadFee(){
+  if(!contract)return;
+  try{
+    const fee=await contract.launchFee();
+    const feeEth=parseFloat(ethers.formatEther(fee)).toFixed(4);
+    document.getElementById('feeDisp').textContent=feeEth+' ETH';
+  }catch{}
+}
+
+async function loadHome(){
+  if(!contract)return;
+  try{
+    const[tc,fee]=await Promise.all([contract.tokenCount(),contract.launchFee()]);
+    document.getElementById('homeCount').textContent=Number(tc);
+    const feeEth=parseFloat(ethers.formatEther(fee)).toFixed(4);
+    document.getElementById('homeFee').textContent=feeEth+' ETH';
+    document.getElementById('feeDisp').textContent=feeEth+' ETH';
+    loadHomeOrbs();
+    loadTicker();
+  }catch{}
+}
+
+async function loadHomeOrbs(){
+  const el=document.getElementById('homeOrbs');
+  try{
+    const toks=await contract.getLatestTokens();
+    if(!toks.length){el.innerHTML='';return;}
+    el.innerHTML=toks.slice(0,6).map(t=>`
+      <div class="tok-orb">
+        <div class="to-ico" style="background:${randColor()}">${(t[2]||t.symbol||'?').slice(0,2).toUpperCase()}</div>
+        <div><div class="to-name">${t[2]||t.name}</div><div class="to-sup">${fmtN(t[3]||t.totalSupply)} supply</div></div>
+      </div>`).join('');
+  }catch{}
+}
+
+async function loadExplore(){
+  const el=document.getElementById('explGrid');
+  el.innerHTML='<div style="text-align:center;padding:48px;grid-column:1/-1;color:var(--text3);font-size:13px;font-family:var(--fm)"><span class="spin"></span> Loading...</div>';
+  try{
+    const count=Number(await contract.tokenCount());
+    if(!count){el.innerHTML='<div class="empty"><h3>No tokens yet</h3><p>Be the first to launch!</p></div>';return;}
+    allToks=[];
+    for(let i=count-1;i>=0;i--){try{allToks.push(await contract.getToken(i));}catch{}}
+    renderToks();
+  }catch{el.innerHTML='<div class="empty"><h3>Error loading</h3></div>';}
+}
+
+function renderToks(){
+  const el=document.getElementById('explGrid');
+  let list=allToks;
+  const q=document.getElementById('sInp')?.value.toLowerCase()||'';
+  if(q)list=list.filter(t=>(t[2]||'').toLowerCase().includes(q)||(t[1]||'').toLowerCase().includes(q));
+  if(curFil==='mint')list=list.filter(t=>t[7]||t.mintable);
+  if(curFil==='burn')list=list.filter(t=>t[6]||t.burnable);
+  if(!list.length){el.innerHTML='<div class="empty"><h3>No tokens found</h3></div>';return;}
+  el.innerHTML=list.map(t=>tokCard(t)).join('');
+}
+
+function tokCard(t){
+  const name=t[2]||t.name||'Unknown';
+  const sym=t[1]||t.symbol||'?';
+  const sup=fmtN(t[3]||t.totalSupply||0);
+  const creator=t[4]||t.creator||'';
+  const ts=t[5]||t.createdAt||0;
+  const addr=t[0]||t.tokenAddress||'';
+  const mintable=t[7]||t.mintable;
+  const burnable=t[6]||t.burnable;
+  const color=randColor();
+  const isMyToken=userAddr&&creator.toLowerCase()===userAddr.toLowerCase();
+  // Get stored image for this token
+  const imgData=localStorage.getItem('tok_img_'+addr);
+  const logoData=localStorage.getItem('tok_logo_'+addr);
+  return`<div class="tok-card">
+    <div class="tc-banner" style="background:linear-gradient(135deg,${color}22,${color}08);">
+      ${imgData?`<img class="tc-banner-img" src="${imgData}" alt="${name}"/>`:`<div class="tc-banner-fallback" style="color:${color}33">$${sym.toUpperCase()}</div>`}
+    </div>
+    <div class="tc-logo-wrap">
+      <div class="tc-logo" style="background:${color}">
+        ${logoData?`<img src="${logoData}" alt="${sym}"/>`:`${sym.slice(0,2).toUpperCase()}`}
+      </div>
+      <span class="tc-new-badge">NEW</span>
+    </div>
+    <div class="tc-info">
+      <div class="tc-name">${name}</div>
+      <div class="tc-sym">$${sym}</div>
+      <div class="tc-stats">
+        <div class="tcs"><div class="tcs-v">${sup}</div><div class="tcs-l">Supply</div></div>
+        <div class="tcs"><div class="tcs-v">${ago(ts)}</div><div class="tcs-l">Launched</div></div>
+      </div>
+      <div class="tc-tags">
+        ${mintable&&isMyToken?`<span class="tctag tt-m" style="cursor:pointer;" onclick="openMintBurn('${addr}','mint','${name}')" title="Click to Mint">MINTABLE ✦</span>`:(mintable?'<span class="tctag tt-m">MINTABLE</span>':'')}
+        ${burnable?`<span class="tctag tt-b" style="cursor:pointer;" onclick="openMintBurn('${addr}','burn','${name}')" title="Click to Burn">BURNABLE ✦</span>`:''}
+      </div>
+      <div class="tc-footer">
+        <span class="tcf-addr" style="cursor:pointer;" onclick="event.stopPropagation();copyTokenAddr('${addr}')" title="Click to copy contract address">${short(creator)} 📋</span>
+        <a class="tcf-link" href="https://basescan.org/address/${addr}" target="_blank">View ↗</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setFil(f,el){curFil=f;document.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));el.classList.add('on');renderToks();}
+
+async function loadMyToks(){
+  const el=document.getElementById('myGrid');
+  if(!userAddr){el.innerHTML='<div class="empty"><h3>Not connected</h3></div>';return;}
+  el.innerHTML='<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--text3);font-size:13px;font-family:var(--fm)"><span class="spin"></span></div>';
+  try{
+    const ids=await contract.getCreatorTokens(userAddr);
+    document.getElementById('myCount').textContent=ids.length;
+    if(!ids.length){el.innerHTML='<div class="empty"><h3>No tokens yet</h3><p>Launch your first token!</p></div>';return;}
+    const toks=await Promise.all(ids.map(id=>contract.getToken(Number(id))));
+    el.innerHTML=toks.map(t=>tokCard(t)).join('');
+  }catch{el.innerHTML='<div class="empty"><h3>Error loading</h3></div>';}
+}
+
+async function launchToken(){
+  if(!contract){toast('Connect wallet first','err');return;}
+  const name=document.getElementById('tName').value.trim();
+  const sym=document.getElementById('tSym').value.trim();
+  const sup=document.getElementById('tSup').value;
+  const dec=document.getElementById('tDec').value||'18';
+  if(!name||!sym||!sup){toast('Fill all required fields','err');return;}
+  const btn=document.getElementById('lBtn');
+  btn.innerHTML='<span class="spin"></span> Launching...';btn.disabled=true;
+  try{
+    const fee=await contract.launchFee();
+    const pop=await contract.launchToken.populateTransaction(name,sym,parseInt(dec),parseInt(sup),mintF,burnF,{value:fee});
+    pop.data=pop.data+DATA_SUFFIX.slice(2);
+    const tx=await signer.sendTransaction(pop);
+    toast('Launching your token...','');
+    await tx.wait();
+    toast('Token launched!','ok');
+    lastLaunch={name,sym,sup:parseInt(sup),addr:''};
+    // Try to get deployed token address from receipt logs
+    try{
+      const log=receipt.logs[receipt.logs.length-1];
+      if(log)lastLaunch.addr='0x'+log.topics[log.topics.length-1]?.slice(-40);
+      if(lastLaunch.addr&&lastLaunch.addr.length===42)saveTokenImages(lastLaunch.addr);
+    }catch{}
+    document.getElementById('tName').value='';
+    document.getElementById('tSym').value='';
+    document.getElementById('tSup').value='';
+    mintF=burnF=false;
+    document.getElementById('togM').classList.remove('on');
+    document.getElementById('togB').classList.remove('on');
+    loadHome();showShare();
+  }catch(e){toast('Error: '+(e.reason||'Failed'),'err');}
+  btn.innerHTML='Launch token';btn.disabled=false;
+}
+
+function showShare(){
+  if(!lastLaunch)return;
+  document.getElementById('scName').textContent=lastLaunch.name;
+  document.getElementById('scSym').textContent='$'+lastLaunch.sym;
+  document.getElementById('scSup').textContent=fmtN(lastLaunch.sup);
+  document.getElementById('shareWrap').style.display='flex';
+}
+
+function shareX(){
+  if(!lastLaunch)return;
+  const txt=`Just launched ${lastLaunch.name} ($${lastLaunch.sym}) on @base\n\n${fmtN(lastLaunch.sup)} total supply\nDeployed via AxiomLaunch\n\n#Base #BuildOnBase`;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(txt)}`,'_blank');
+}
+
+function copyAddr(){navigator.clipboard.writeText(FACTORY);toast('Copied!','ok');}
+
+function copyTokenAddr(addr){
+  navigator.clipboard.writeText(addr);
+  toast('Contract address copied!','ok');
+}
+
+window.addEventListener('load',async()=>{
+  if(window.ethereum){const a=await window.ethereum.request({method:'eth_accounts'});if(a.length)connectWallet();}
+});
+</script>
+</body>
+</html>
