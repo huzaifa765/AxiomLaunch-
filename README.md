@@ -68,6 +68,13 @@ Anyone can deploy a verified token in under 5 minutes — no Solidity, no Remix,
 - [ ] Uniswap liquidity integration
 - [ ] Token image/banner via IPFS
 - [ ] Mobile responsive improvements
+- [ ] ## Why AxiomLaunch
+
+- No coding required
+- Deploy in under 5 minutes
+- All contracts verified on BaseScan
+- Mint and burn controls included
+- Full ownership from day one
 
 ---
 
