@@ -75,7 +75,12 @@ Anyone can deploy a verified token in under 5 minutes — no Solidity, no Remix,
 - All contracts verified on BaseScan
 - Mint and burn controls included
 - Full ownership from day one
+## Token Standards
 
+- ERC20 fully compatible
+- Works with all Base wallets
+- Tradeable on Aerodrome and Uniswap
+- Verified on BaseScan automatically
 ---
 
 ## License
