@@ -81,7 +81,12 @@ Anyone can deploy a verified token in under 5 minutes — no Solidity, no Remix,
 - Works with all Base wallets
 - Tradeable on Aerodrome and Uniswap
 - Verified on BaseScan automatically
----
+- ## Recent Updates
+
+- Added copy-to-clipboard for token addresses
+- Token banner and logo image support
+- Live ticker strip added
+- Mint and burn controls on token cards
 
 ## License
 
