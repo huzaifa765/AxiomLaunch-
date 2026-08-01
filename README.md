@@ -86,6 +86,12 @@ Anyone can deploy a verified token in under 5 minutes — no Solidity, no Remix,
 - Added copy-to-clipboard for token addresses
 - Token banner and logo image support
 - Live ticker strip added
+- ## Community Stats
+
+- Tokens deployed on Base Mainnet
+- All contracts auto-verified
+- Open source — MIT License
+- Active since 2024
 - Mint and burn controls on token cards
 
 ## License
