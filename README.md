@@ -92,6 +92,12 @@ Anyone can deploy a verified token in under 5 minutes — no Solidity, no Remix,
 - All contracts auto-verified
 - Open source — MIT License
 - Active since 2024
+- ## Builder Notes
+
+- All tokens ERC20 standard compliant
+- Contracts deployed via TokenFactory
+- Each token independently verified
+- Builder attribution via bc_hxh4hpay
 - Mint and burn controls on token cards
 
 ## License
